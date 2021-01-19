@@ -39,7 +39,7 @@ const shouldRecurse = async function (
   if (!fileInfo.stats.isDirectory()) {
     return false;
   }
-  if (depth < 0) {
+  if (depth <= 0) {
     return false;
   }
 
