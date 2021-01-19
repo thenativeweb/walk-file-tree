@@ -1,0 +1,27 @@
+{
+  "name": "walk-file-tree",
+  "version": "1.0.0",
+  "description": "Recursively walk through a file tree.",
+  "main": "build/lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thenativeweb/walk-file-tree.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/thenativeweb/walk-file-tree/issues"
+  },
+  "homepage": "https://github.com/thenativeweb/walk-file-tree#readme",
+  "devDependencies": {
+    "assertthat": "^5.2.5",
+    "roboter": "11.6.4"
+  },
+  "dependencies": {
+    "@types/node": "14.14.21",
+    "defekt": "^6.0.1"
+  }
+}
