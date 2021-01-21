@@ -1,6 +1,6 @@
 import { assert } from 'assertthat';
 import path from 'path';
-import { FileInfo, walk } from '../../lib';
+import { walk } from '../../lib';
 
 const collectAsyncIterable = async function<T> (iterable: AsyncIterable<T>): Promise<T[]> {
   const elements: T[] = [];
@@ -29,7 +29,6 @@ suite('walk', (): void => {
         yields: 'files'
       })
     );
-    const filePaths = files.map((fileInfo: FileInfo): string => fileInfo.pathName);
     const expectedFiles = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -47,7 +46,7 @@ suite('walk', (): void => {
     );
 
     assert.that(files.length).is.equalTo(expectedFiles.length);
-    assert.that(filePaths).is.containingAllOf(expectedFiles);
+    assert.that(files).is.containingAllOf(expectedFiles);
   });
 
   test('yields all directories.', async (): Promise<void> => {
@@ -57,7 +56,6 @@ suite('walk', (): void => {
         yields: 'directories'
       })
     );
-    const directoryPaths = directories.map((fileInfo: FileInfo): string => fileInfo.pathName);
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -74,7 +72,7 @@ suite('walk', (): void => {
     );
 
     assert.that(directories.length).is.equalTo(expectedDirectories.length);
-    assert.that(directoryPaths).is.containingAllOf(expectedDirectories);
+    assert.that(directories).is.containingAllOf(expectedDirectories);
   });
 
   test('yields all files matching some function.', async (): Promise<void> => {
@@ -82,10 +80,9 @@ suite('walk', (): void => {
       walk({
         directory: testDirectory,
         yields: 'files',
-        matches: ({ pathName }): boolean => pathName.includes('flatDirectory')
+        matches: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
-    const filePaths = files.map(({ pathName }): string => pathName);
     const expectedFiles = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -95,7 +92,7 @@ suite('walk', (): void => {
     );
 
     assert.that(files.length).is.equalTo(expectedFiles.length);
-    assert.that(filePaths).is.containingAllOf(expectedFiles);
+    assert.that(files).is.containingAllOf(expectedFiles);
   });
 
   test('yields all files except excluded ones.', async (): Promise<void> => {
@@ -103,10 +100,9 @@ suite('walk', (): void => {
       walk({
         directory: testDirectory,
         yields: 'files',
-        excludes: ({ pathName }): boolean => pathName.includes('flatDirectory')
+        excludes: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
-    const filePaths = files.map(({ pathName }): string => pathName);
     const expectedFiles = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -122,7 +118,7 @@ suite('walk', (): void => {
     );
 
     assert.that(files.length).is.equalTo(expectedFiles.length);
-    assert.that(filePaths).is.containingAllOf(expectedFiles);
+    assert.that(files).is.containingAllOf(expectedFiles);
   });
 
   test('yields all files up to a certain depth.', async (): Promise<void> => {
@@ -133,7 +129,6 @@ suite('walk', (): void => {
         depth: 2
       })
     );
-    const filePaths = files.map(({ pathName }): string => pathName);
     const expectedFiles = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -148,24 +143,23 @@ suite('walk', (): void => {
     );
 
     assert.that(files.length).is.equalTo(expectedFiles.length);
-    assert.that(filePaths).is.containingAllOf(expectedFiles);
+    assert.that(files).is.containingAllOf(expectedFiles);
   });
 
-  test('yields all files, even ones that are actually symbolic links.', async (): Promise<void> => {
+  test('yields all files, even ones that are actually symbolic links or are behind symbolic links.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
         yields: 'files',
-        followsSymlinks: true,
-        depth: 10
+        followsSymlinks: true
       })
     );
-    const filePaths = files.map(({ pathName }): string => pathName);
     const expectedFiles = makePlatformIndependentPaths(
       testDirectory,
       [
-        [ 'symlinksDirectory', 'goto_file_10' ],
-        [ 'symlinksDirectory', 'externalSymlinkedDirectory', 'file_11' ],
+        [ '..', 'symlinkTargets', 'file_10' ],
+        [ '..', 'symlinkTargets', 'linkedDirectory', 'file_11' ],
+        [ '..', 'symlinkTargets', 'linkedDirectory', 'externalNestedDirectory', 'file_12' ],
         [ 'flatDirectory', 'file_1' ],
         [ 'flatDirectory', 'file_2' ],
         [ 'deepDirectory_depth_0', 'file_4' ],
@@ -180,7 +174,7 @@ suite('walk', (): void => {
     );
 
     assert.that(files.length).is.equalTo(expectedFiles.length);
-    assert.that(filePaths).is.containingAllOf(expectedFiles);
+    assert.that(files).is.containingAllOf(expectedFiles);
   });
 
   test('yields all directories matching some function.', async (): Promise<void> => {
@@ -188,10 +182,9 @@ suite('walk', (): void => {
       walk({
         directory: testDirectory,
         yields: 'directories',
-        matches: ({ pathName }): boolean => pathName.includes('deepDirectory')
+        matches: (pathName): boolean => pathName.includes('deepDirectory')
       })
     );
-    const directoryPaths = directories.map((fileInfo: FileInfo): string => fileInfo.pathName);
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -204,7 +197,7 @@ suite('walk', (): void => {
     );
 
     assert.that(directories.length).is.equalTo(expectedDirectories.length);
-    assert.that(directoryPaths).is.containingAllOf(expectedDirectories);
+    assert.that(directories).is.containingAllOf(expectedDirectories);
   });
 
   test('yields all directories except excluded ones.', async (): Promise<void> => {
@@ -212,10 +205,9 @@ suite('walk', (): void => {
       walk({
         directory: testDirectory,
         yields: 'directories',
-        excludes: ({ pathName }): boolean => pathName.includes('symlinks')
+        excludes: (pathName): boolean => pathName.includes('symlinks')
       })
     );
-    const directoryPaths = directories.map((fileInfo: FileInfo): string => fileInfo.pathName);
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -229,7 +221,7 @@ suite('walk', (): void => {
     );
 
     assert.that(directories.length).is.equalTo(expectedDirectories.length);
-    assert.that(directoryPaths).is.containingAllOf(expectedDirectories);
+    assert.that(directories).is.containingAllOf(expectedDirectories);
   });
 
   test('yields all directories up to a certain depth.', async (): Promise<void> => {
@@ -240,7 +232,6 @@ suite('walk', (): void => {
         depth: 1
       })
     );
-    const directoryPaths = directories.map((fileInfo: FileInfo): string => fileInfo.pathName);
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
@@ -254,6 +245,34 @@ suite('walk', (): void => {
     );
 
     assert.that(directories.length).is.equalTo(expectedDirectories.length);
-    assert.that(directoryPaths).is.containingAllOf(expectedDirectories);
+    assert.that(directories).is.containingAllOf(expectedDirectories);
+  });
+
+  test('yields all directories, even when symlinks are involved.', async (): Promise<void> => {
+    const directories = await collectAsyncIterable(
+      walk({
+        directory: testDirectory,
+        yields: 'directories',
+        followsSymlinks: true
+      })
+    );
+    console.log(directories);
+    const expectedDirectories = makePlatformIndependentPaths(
+      testDirectory,
+      [
+        [ 'symlinksDirectory' ],
+        [ 'symlinksDirectory', 'externalSymlinkedDirectory' ],
+        [ 'symlinksDirectory', 'externalSymlinkedDirectory', 'externalNextedDirectory' ],
+        [ 'flatDirectory' ],
+        [ 'deepDirectory_depth_0' ],
+        [ 'deepDirectory_depth_0', 'depth_1', 'depth_2', 'depth_3' ],
+        [ 'deepDirectory_depth_0', 'depth_1', 'depth_2', 'depth_3', 'depth_4' ],
+        [ 'deepDirectory_depth_0', 'depth_1', 'depth_2' ],
+        [ 'deepDirectory_depth_0', 'depth_1' ]
+      ]
+    );
+
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
+    assert.that(directories).is.containingAllOf(expectedDirectories);
   });
 });

@@ -1,14 +1,8 @@
 import { errors } from './errors';
-import fs from 'fs';
 import fsPromises from 'fs/promises';
 import path from 'path';
 
-type MatcherFunction = (fileInfo: FileInfo) => boolean;
-
-interface FileInfo {
-  pathName: string;
-  stats: fs.Stats;
-}
+type MatcherFunction = (pathName: string) => boolean;
 
 interface WalkOptions {
   miles?: 500;
@@ -24,6 +18,11 @@ interface DoWalkOptions extends WalkOptions {
   visited: string[];
 }
 
+interface DoWalkResult {
+  pathName: string;
+  visited: string[];
+}
+
 const alwaysTrue = function (): boolean {
   return true;
 };
@@ -32,18 +31,18 @@ const alwaysFalse = function (): boolean {
   return false;
 };
 
-const shouldRecurse = async function (
-  fileInfo: FileInfo,
-  depth: number
-): Promise<boolean> {
-  if (!fileInfo.stats.isDirectory()) {
-    return false;
-  }
-  if (depth <= 0) {
-    return false;
-  }
+const resolveSymlink = async function (pathName: string): Promise<string> {
+  const parentDirectory = path.resolve(pathName, '..');
+  const linkTarget = await fsPromises.readlink(pathName);
+  const resolvedPath = path.resolve(parentDirectory, linkTarget);
 
-  return true;
+  return resolvedPath;
+};
+
+const setMerge = function (anArray: string[], anotherArray: string[]): string[] {
+  const asSet = new Set([ ...anArray, ...anotherArray ]);
+
+  return [ ...asSet ];
 };
 
 const doWalk = async function * ({
@@ -54,76 +53,83 @@ const doWalk = async function * ({
   followsSymlinks = false,
   depth = Number.POSITIVE_INFINITY,
   visited
-}: DoWalkOptions): AsyncIterable<FileInfo> {
-  let canonicalDirectory = directory;
+}: DoWalkOptions): AsyncIterable<DoWalkResult> {
+  const isDirectorySymlink = (await fsPromises.lstat(directory)).isSymbolicLink();
+  const canonicalDirectory = isDirectorySymlink ? await resolveSymlink(directory) : directory;
+  let visitedInThisScope = [ ...visited ];
 
-  if ((await fsPromises.lstat(directory)).isSymbolicLink()) {
-    canonicalDirectory = path.join('..', await fsPromises.readlink(directory));
+  if (visited.includes(canonicalDirectory)) {
+    return;
   }
 
-  for await (const childName of await fsPromises.readdir(directory)) {
-    const childPath = path.join(directory, childName);
-    const fileInfo = {
-      pathName: childPath,
-      stats: await fsPromises.stat(childPath)
-    };
+  for await (const childName of await fsPromises.readdir(canonicalDirectory)) {
+    const pathName = path.join(canonicalDirectory, childName);
+    const statResult = await fsPromises.stat(pathName);
+    const lstatResult = await fsPromises.lstat(pathName);
+    const isSymbolicLink = lstatResult.isSymbolicLink();
+    const isDirectory = statResult.isDirectory();
+    const isFile = statResult.isFile();
 
-    const isSymbolicLink = (await fsPromises.lstat(fileInfo.pathName)).isSymbolicLink();
-
-    if (isSymbolicLink) {
-      const canonicalPath = path.resolve(directory, await fsPromises.readlink(fileInfo.pathName));
-
-      if (!followsSymlinks) {
-        continue;
-      }
-
-      if (visited.includes(canonicalPath)) {
-        continue;
-      }
+    if (isSymbolicLink && !followsSymlinks) {
+      continue;
     }
 
-    if (await shouldRecurse(fileInfo, depth)) {
-      yield * doWalk({
-        directory: childPath,
+    console.log({
+      pathName,
+      visitedInThisScope
+    });
+
+    if (isDirectory && (depth > 0)) {
+      for await (const doWalkResult of doWalk({
+        directory: pathName,
         yields,
         matches,
         excludes,
         followsSymlinks,
         depth: depth - 1,
-        visited: [ ...visited, canonicalDirectory ]
-      });
+        visited: [ ...visitedInThisScope, canonicalDirectory ]
+      })) {
+        visitedInThisScope = setMerge(visitedInThisScope, doWalkResult.visited);
+
+        yield {
+          pathName: doWalkResult.pathName,
+          visited: visitedInThisScope
+        };
+      }
     }
 
-    if (yields === 'directories' && !fileInfo.stats.isDirectory()) {
+    if (yields === 'directories' && !isDirectory) {
       continue;
     }
-    if (yields === 'files' && !fileInfo.stats.isFile()) {
+    if (yields === 'files' && !isFile) {
       continue;
     }
-    if (yields === 'filesAndDirectories' && !(fileInfo.stats.isFile() || fileInfo.stats.isDirectory())) {
-      continue;
-    }
-
-    if (excludes(fileInfo)) {
-      continue;
-    }
-    if (!matches(fileInfo)) {
+    if (yields === 'filesAndDirectories' && !(isFile || isDirectory)) {
       continue;
     }
 
-    yield fileInfo;
+    if (excludes(pathName)) {
+      continue;
+    }
+    if (!matches(pathName)) {
+      continue;
+    }
+
+    yield {
+      pathName: isSymbolicLink ? await resolveSymlink(pathName) : pathName,
+      visited: visitedInThisScope
+    };
   }
 };
 
-const walk = async function * (options: WalkOptions): AsyncIterable<FileInfo> {
+const walk = async function * (options: WalkOptions): AsyncIterable<string> {
   if (!path.isAbsolute(options.directory)) {
     throw new errors.RelativePathsAreUnsupported();
   }
-  yield * doWalk({ ...options, visited: []});
-};
 
-export type {
-  FileInfo
+  for await (const { pathName } of doWalk({ ...options, visited: []})) {
+    yield pathName;
+  }
 };
 
 export {
