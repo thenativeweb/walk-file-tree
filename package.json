@@ -4,6 +4,8 @@
   "description": "Recursively walk through a file tree.",
   "main": "build/lib/index.js",
   "scripts": {
+    "build": "npm run clean && npx tsc",
+    "clean": "npx rimraf ./build",
     "test": "npx roboter"
   },
   "repository": {
@@ -17,7 +19,8 @@
   },
   "homepage": "https://github.com/thenativeweb/walk-file-tree#readme",
   "devDependencies": {
-    "assertthat": "^5.2.5",
+    "assertthat": "5.2.5",
+    "rimraf": "^3.0.2",
     "roboter": "11.6.4"
   },
   "dependencies": {
