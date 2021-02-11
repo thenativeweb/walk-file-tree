@@ -1,4 +1,5 @@
 import { assert } from 'assertthat';
+import { FileTypes } from '../../types/FileTypes';
 import path from 'path';
 import { walk } from '../../lib';
 
@@ -26,7 +27,7 @@ suite('walk', (): void => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'files'
+        yields: [ FileTypes.files ]
       })
     );
     const expectedFiles = makePlatformIndependentPaths(
@@ -45,20 +46,21 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(files.length).is.equalTo(expectedFiles.length);
     assert.that(files).is.containingAllOf(expectedFiles);
+    assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
   test('yields all directories.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'directories'
+        yields: [ FileTypes.directories ]
       })
     );
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
+        [ '.' ],
         [ 'symlinksDirectory' ],
         [ 'symlinksDirectory', 'hereBeSymlinkA' ],
         [ 'symlinksDirectory', 'hereBeSymlinkB' ],
@@ -71,15 +73,15 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(directories.length).is.equalTo(expectedDirectories.length);
     assert.that(directories).is.containingAllOf(expectedDirectories);
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 
   test('yields all files matching some function.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'files',
+        yields: [ FileTypes.files ],
         matches: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
@@ -91,15 +93,15 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(files.length).is.equalTo(expectedFiles.length);
     assert.that(files).is.containingAllOf(expectedFiles);
+    assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
   test('yields all files except excluded ones.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'files',
+        yields: [ FileTypes.files ],
         excludes: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
@@ -117,16 +119,16 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(files.length).is.equalTo(expectedFiles.length);
     assert.that(files).is.containingAllOf(expectedFiles);
+    assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
   test('yields all files up to a certain depth.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'files',
-        depth: 2
+        yields: [ FileTypes.files ],
+        maximumDepth: 2
       })
     );
     const expectedFiles = makePlatformIndependentPaths(
@@ -137,20 +139,19 @@ suite('walk', (): void => {
         [ 'deepDirectory_depth_0', 'file_4' ],
         [ 'deepDirectory_depth_0', 'file_3' ],
         [ 'deepDirectory_depth_0', 'file_6' ],
-        [ 'deepDirectory_depth_0', 'depth_1', 'file_7' ],
         [ 'file_0' ]
       ]
     );
 
-    assert.that(files.length).is.equalTo(expectedFiles.length);
     assert.that(files).is.containingAllOf(expectedFiles);
+    assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
   test('yields all files, even ones that are actually symbolic links or are behind symbolic links.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'files',
+        yields: [ FileTypes.files ],
         followsSymlinks: true
       })
     );
@@ -173,15 +174,15 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(files.length).is.equalTo(expectedFiles.length);
     assert.that(files).is.containingAllOf(expectedFiles);
+    assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
   test('yields all directories matching some function.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'directories',
+        yields: [ FileTypes.directories ],
         matches: (pathName): boolean => pathName.includes('deepDirectory')
       })
     );
@@ -196,21 +197,22 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(directories.length).is.equalTo(expectedDirectories.length);
     assert.that(directories).is.containingAllOf(expectedDirectories);
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 
   test('yields all directories except excluded ones.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'directories',
+        yields: [ FileTypes.directories ],
         excludes: (pathName): boolean => pathName.includes('symlinks')
       })
     );
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
+        [ '.' ],
         [ 'flatDirectory' ],
         [ 'deepDirectory_depth_0' ],
         [ 'deepDirectory_depth_0', 'depth_1' ],
@@ -220,21 +222,22 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(directories.length).is.equalTo(expectedDirectories.length);
     assert.that(directories).is.containingAllOf(expectedDirectories);
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 
   test('yields all directories up to a certain depth.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'directories',
-        depth: 1
+        yields: [ FileTypes.directories ],
+        maximumDepth: 2
       })
     );
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
+        [ '.' ],
         [ 'symlinksDirectory' ],
         [ 'symlinksDirectory', 'hereBeSymlinkA' ],
         [ 'symlinksDirectory', 'hereBeSymlinkB' ],
@@ -244,25 +247,27 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(directories.length).is.equalTo(expectedDirectories.length);
     assert.that(directories).is.containingAllOf(expectedDirectories);
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 
   test('yields all directories, even when symlinks are involved.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: 'directories',
+        yields: [ FileTypes.directories ],
         followsSymlinks: true
       })
     );
-    console.log(directories);
     const expectedDirectories = makePlatformIndependentPaths(
       testDirectory,
       [
+        [ '.' ],
         [ 'symlinksDirectory' ],
-        [ 'symlinksDirectory', 'externalSymlinkedDirectory' ],
-        [ 'symlinksDirectory', 'externalSymlinkedDirectory', 'externalNextedDirectory' ],
+        [ 'symlinksDirectory', 'hereBeSymlinkA' ],
+        [ 'symlinksDirectory', 'hereBeSymlinkB' ],
+        [ '..', 'symlinkTargets', 'linkedDirectory' ],
+        [ '..', 'symlinkTargets', 'linkedDirectory', 'externalNestedDirectory' ],
         [ 'flatDirectory' ],
         [ 'deepDirectory_depth_0' ],
         [ 'deepDirectory_depth_0', 'depth_1', 'depth_2', 'depth_3' ],
@@ -272,7 +277,7 @@ suite('walk', (): void => {
       ]
     );
 
-    assert.that(directories.length).is.equalTo(expectedDirectories.length);
     assert.that(directories).is.containingAllOf(expectedDirectories);
+    assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 });

@@ -1,27 +1,13 @@
-import { errors } from './errors';
-import fsPromises from 'fs/promises';
-import path from 'path';
+import { FileTypes } from '../types/FileTypes';
+import fs from 'fs/promises';
+import { kaputt } from '@yeldirium/kaputt';
+import nodePath from 'path';
+import { Options } from '../types/Options';
+import { Queue } from './queue';
+import { resolveSymlink } from './resolveSymlink';
+import { unpackOrCrash } from '@yeldirium/result';
 
-type MatcherFunction = (pathName: string) => boolean;
-
-interface WalkOptions {
-  miles?: 500;
-  directory: string;
-  yields?: 'directories' | 'files' | 'filesAndDirectories';
-  matches?: MatcherFunction;
-  excludes?: MatcherFunction;
-  followsSymlinks?: boolean;
-  depth?: number;
-}
-
-interface DoWalkOptions extends WalkOptions {
-  visited: string[];
-}
-
-interface DoWalkResult {
-  pathName: string;
-  visited: string[];
-}
+class RelativePathsAreUnsupported extends kaputt('RelativePathsAreUnsupported') {}
 
 const alwaysTrue = function (): boolean {
   return true;
@@ -31,42 +17,39 @@ const alwaysFalse = function (): boolean {
   return false;
 };
 
-const resolveSymlink = async function (pathName: string): Promise<string> {
-  const parentDirectory = path.resolve(pathName, '..');
-  const linkTarget = await fsPromises.readlink(pathName);
-  const resolvedPath = path.resolve(parentDirectory, linkTarget);
-
-  return resolvedPath;
-};
-
-const setMerge = function (anArray: string[], anotherArray: string[]): string[] {
-  const asSet = new Set([ ...anArray, ...anotherArray ]);
-
-  return [ ...asSet ];
-};
-
-const doWalk = async function * ({
+const walk = async function * ({
   directory,
-  yields = 'filesAndDirectories',
+  yields = [ FileTypes.files, FileTypes.directories ],
   matches = alwaysTrue,
   excludes = alwaysFalse,
   followsSymlinks = false,
-  depth = Number.POSITIVE_INFINITY,
-  visited
-}: DoWalkOptions): AsyncIterable<DoWalkResult> {
-  const isDirectorySymlink = (await fsPromises.lstat(directory)).isSymbolicLink();
-  const canonicalDirectory = isDirectorySymlink ? await resolveSymlink(directory) : directory;
-  let visitedInThisScope = [ ...visited ];
-
-  if (visited.includes(canonicalDirectory)) {
-    return;
+  maximumDepth = Number.POSITIVE_INFINITY
+}: Options): AsyncIterable<string> {
+  if (!nodePath.isAbsolute(directory)) {
+    throw new RelativePathsAreUnsupported(undefined, { data: { directory }});
   }
 
-  for await (const childName of await fsPromises.readdir(canonicalDirectory)) {
-    const pathName = path.join(canonicalDirectory, childName);
-    const statResult = await fsPromises.stat(pathName);
-    const lstatResult = await fsPromises.lstat(pathName);
+  const paths = new Queue<{ path: string; depth: number }>(
+    { path: directory, depth: 0 }
+  );
+  const visisitedPaths = new Set<string>();
+
+  while (!paths.isEmpty()) {
+    const { path, depth } = unpackOrCrash(paths.pop());
+
+    if (depth > maximumDepth) {
+      continue;
+    }
+
+    const lstatResult = await fs.lstat(path);
     const isSymbolicLink = lstatResult.isSymbolicLink();
+    const realPath = isSymbolicLink ? await resolveSymlink(path) : path;
+
+    if (visisitedPaths.has(realPath)) {
+      continue;
+    }
+
+    const statResult = await fs.stat(realPath);
     const isDirectory = statResult.isDirectory();
     const isFile = statResult.isFile();
 
@@ -74,61 +57,27 @@ const doWalk = async function * ({
       continue;
     }
 
-    console.log({
-      pathName,
-      visitedInThisScope
-    });
-
-    if (isDirectory && (depth > 0)) {
-      for await (const doWalkResult of doWalk({
-        directory: pathName,
-        yields,
-        matches,
-        excludes,
-        followsSymlinks,
-        depth: depth - 1,
-        visited: [ ...visitedInThisScope, canonicalDirectory ]
-      })) {
-        visitedInThisScope = setMerge(visitedInThisScope, doWalkResult.visited);
-
-        yield {
-          pathName: doWalkResult.pathName,
-          visited: visitedInThisScope
-        };
+    if (matches(realPath) && !excludes(realPath)) {
+      if (isFile && yields.includes(FileTypes.files)) {
+        yield realPath;
+      }
+      if (isDirectory && yields.includes(FileTypes.directories)) {
+        yield realPath;
       }
     }
 
-    if (yields === 'directories' && !isDirectory) {
-      continue;
-    }
-    if (yields === 'files' && !isFile) {
-      continue;
-    }
-    if (yields === 'filesAndDirectories' && !(isFile || isDirectory)) {
-      continue;
-    }
-
-    if (excludes(pathName)) {
-      continue;
-    }
-    if (!matches(pathName)) {
-      continue;
+    if (isDirectory) {
+      paths.push(
+        ...(await fs.readdir(realPath)).map(
+          (child): { path: string; depth: number } => ({
+            path: nodePath.join(realPath, child),
+            depth: depth + 1
+          })
+        )
+      );
     }
 
-    yield {
-      pathName: isSymbolicLink ? await resolveSymlink(pathName) : pathName,
-      visited: visitedInThisScope
-    };
-  }
-};
-
-const walk = async function * (options: WalkOptions): AsyncIterable<string> {
-  if (!path.isAbsolute(options.directory)) {
-    throw new errors.RelativePathsAreUnsupported();
-  }
-
-  for await (const { pathName } of doWalk({ ...options, visited: []})) {
-    yield pathName;
+    visisitedPaths.add(realPath);
   }
 };
 
