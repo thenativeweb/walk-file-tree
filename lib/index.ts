@@ -1,8 +1,8 @@
-import { FileTypes } from '../types/FileTypes';
+import { EntryType } from './types/EntryType';
 import fs from 'fs/promises';
 import { kaputt } from '@yeldirium/kaputt';
 import nodePath from 'path';
-import { Options } from '../types/Options';
+import { Options } from './types/Options';
 import { Queue } from './queue';
 import { resolveSymlink } from './resolveSymlink';
 import { unpackOrCrash } from '@yeldirium/result';
@@ -19,9 +19,9 @@ const alwaysFalse = function (): boolean {
 
 const walk = async function * ({
   directory,
-  yields = [ FileTypes.files, FileTypes.directories ],
+  yields = [ EntryType.files, EntryType.directories ],
   matches = alwaysTrue,
-  excludes = alwaysFalse,
+  ignores = alwaysFalse,
   followsSymlinks = false,
   maximumDepth = Number.POSITIVE_INFINITY
 }: Options): AsyncIterable<string> {
@@ -57,11 +57,11 @@ const walk = async function * ({
       continue;
     }
 
-    if (matches(realPath) && !excludes(realPath)) {
-      if (isFile && yields.includes(FileTypes.files)) {
+    if (matches(realPath) && !ignores(realPath)) {
+      if (isFile && yields.includes(EntryType.files)) {
         yield realPath;
       }
-      if (isDirectory && yields.includes(FileTypes.directories)) {
+      if (isDirectory && yields.includes(EntryType.directories)) {
         yield realPath;
       }
     }
@@ -81,6 +81,4 @@ const walk = async function * ({
   }
 };
 
-export {
-  walk
-};
+export { walk, EntryType };

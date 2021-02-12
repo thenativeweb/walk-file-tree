@@ -1,12 +1,12 @@
-import { FileTypes } from '../types/FileTypes';
+import { EntryType } from './EntryType';
 import { MatcherFunction } from './MatcherFunction';
 
 export interface Options {
   miles?: 500;
   directory: string;
-  yields?: FileTypes[];
+  yields?: EntryType[];
   matches?: MatcherFunction;
-  excludes?: MatcherFunction;
+  ignores?: MatcherFunction;
   followsSymlinks?: boolean;
   maximumDepth?: number;
 }

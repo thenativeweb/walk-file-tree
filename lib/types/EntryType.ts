@@ -1,4 +1,4 @@
-export enum FileTypes {
+export enum EntryType {
   directories = 'directories',
   files = 'files',
 }

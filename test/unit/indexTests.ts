@@ -1,5 +1,5 @@
 import { assert } from 'assertthat';
-import { FileTypes } from '../../types/FileTypes';
+import { EntryType } from '../../lib/types/EntryType';
 import path from 'path';
 import { walk } from '../../lib';
 
@@ -27,7 +27,7 @@ suite('walk', (): void => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.files ]
+        yields: [ EntryType.files ]
       })
     );
     const expectedFiles = makePlatformIndependentPaths(
@@ -54,7 +54,7 @@ suite('walk', (): void => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.directories ]
+        yields: [ EntryType.directories ]
       })
     );
     const expectedDirectories = makePlatformIndependentPaths(
@@ -81,7 +81,7 @@ suite('walk', (): void => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.files ],
+        yields: [ EntryType.files ],
         matches: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
@@ -97,12 +97,12 @@ suite('walk', (): void => {
     assert.that(files.length).is.equalTo(expectedFiles.length);
   });
 
-  test('yields all files except excluded ones.', async (): Promise<void> => {
+  test('yields all files except ignored ones.', async (): Promise<void> => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.files ],
-        excludes: (pathName): boolean => pathName.includes('flatDirectory')
+        yields: [ EntryType.files ],
+        ignores: (pathName): boolean => pathName.includes('flatDirectory')
       })
     );
     const expectedFiles = makePlatformIndependentPaths(
@@ -127,7 +127,7 @@ suite('walk', (): void => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.files ],
+        yields: [ EntryType.files ],
         maximumDepth: 2
       })
     );
@@ -151,7 +151,7 @@ suite('walk', (): void => {
     const files = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.files ],
+        yields: [ EntryType.files ],
         followsSymlinks: true
       })
     );
@@ -182,7 +182,7 @@ suite('walk', (): void => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.directories ],
+        yields: [ EntryType.directories ],
         matches: (pathName): boolean => pathName.includes('deepDirectory')
       })
     );
@@ -201,12 +201,12 @@ suite('walk', (): void => {
     assert.that(directories.length).is.equalTo(expectedDirectories.length);
   });
 
-  test('yields all directories except excluded ones.', async (): Promise<void> => {
+  test('yields all directories except ignored ones.', async (): Promise<void> => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.directories ],
-        excludes: (pathName): boolean => pathName.includes('symlinks')
+        yields: [ EntryType.directories ],
+        ignores: (pathName): boolean => pathName.includes('symlinks')
       })
     );
     const expectedDirectories = makePlatformIndependentPaths(
@@ -230,7 +230,7 @@ suite('walk', (): void => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.directories ],
+        yields: [ EntryType.directories ],
         maximumDepth: 2
       })
     );
@@ -255,7 +255,7 @@ suite('walk', (): void => {
     const directories = await collectAsyncIterable(
       walk({
         directory: testDirectory,
-        yields: [ FileTypes.directories ],
+        yields: [ EntryType.directories ],
         followsSymlinks: true
       })
     );
