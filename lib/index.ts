@@ -1,5 +1,5 @@
 import { EntryType } from './types/EntryType';
-import fs from 'fs/promises';
+import fs from 'fs';
 import { kaputt } from '@yeldirium/kaputt';
 import nodePath from 'path';
 import { Options } from './types/Options';
@@ -41,7 +41,7 @@ const walk = async function * ({
       continue;
     }
 
-    const lstatResult = await fs.lstat(path);
+    const lstatResult = await fs.promises.lstat(path);
     const isSymbolicLink = lstatResult.isSymbolicLink();
     const realPath = isSymbolicLink ? await resolveSymlink(path) : path;
 
@@ -49,7 +49,7 @@ const walk = async function * ({
       continue;
     }
 
-    const statResult = await fs.stat(realPath);
+    const statResult = await fs.promises.stat(realPath);
     const isDirectory = statResult.isDirectory();
     const isFile = statResult.isFile();
 
@@ -68,7 +68,7 @@ const walk = async function * ({
 
     if (isDirectory) {
       paths.push(
-        ...(await fs.readdir(realPath)).map(
+        ...(await fs.promises.readdir(realPath)).map(
           (child): { path: string; depth: number } => ({
             path: nodePath.join(realPath, child),
             depth: depth + 1
