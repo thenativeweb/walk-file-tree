@@ -1,0 +1,46 @@
+{
+  "name": "walk-file-tree",
+  "version": "0.0.1",
+  "description": "Recursively walk through a file tree.",
+  "contributors": [
+    {
+      "name": "Golo Roden",
+      "email": "golo.roden@thenativeweb.io"
+    },
+    {
+      "name": "Noah Hummel",
+      "email": "noah.hummel@thenativeweb.io"
+    },
+    {
+      "name": "Alexander Kampf",
+      "email": "alexander.kampf@thenativeweb.io"
+    },
+    {
+      "name": "Hannes Leutloff",
+      "email": "hannes.leutloff@thenativeweb.io"
+    }
+  ],
+  "main": "build/lib/index.js",
+  "types": "build/lib/index.d.ts",
+  "dependencies": {
+    "@types/node": "14.14.35",
+    "@yeldirium/kaputt": "2.1.0",
+    "@yeldirium/result": "1.2.0"
+  },
+  "devDependencies": {
+    "assertthat": "5.2.5",
+    "roboter": "11.6.30",
+    "semantic-release-configuration": "1.0.30"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thenativeweb/walk-file-tree.git"
+  },
+  "keywords": [
+    "file",
+    "directory",
+    "recursive",
+    "walk"
+  ],
+  "license": "MIT"
+}
