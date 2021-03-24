@@ -1,31 +1,46 @@
 {
   "name": "walk-file-tree",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "Recursively walk through a file tree.",
+  "contributors": [
+    {
+      "name": "Golo Roden",
+      "email": "golo.roden@thenativeweb.io"
+    },
+    {
+      "name": "Noah Hummel",
+      "email": "noah.hummel@thenativeweb.io"
+    },
+    {
+      "name": "Alexander Kampf",
+      "email": "alexander.kampf@thenativeweb.io"
+    },
+    {
+      "name": "Hannes Leutloff",
+      "email": "hannes.leutloff@thenativeweb.io"
+    }
+  ],
   "main": "build/lib/index.js",
-  "scripts": {
-    "build": "npm run clean && npx tsc",
-    "clean": "npx rimraf ./build",
-    "test": "npx roboter"
+  "types": "build/lib/index.d.ts",
+  "dependencies": {
+    "@types/node": "14.14.35",
+    "@yeldirium/kaputt": "2.1.0",
+    "@yeldirium/result": "1.2.0"
+  },
+  "devDependencies": {
+    "assertthat": "5.2.5",
+    "roboter": "11.6.30",
+    "semantic-release-configuration": "1.0.30"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/thenativeweb/walk-file-tree.git"
+    "url": "git://github.com/thenativeweb/walk-file-tree.git"
   },
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/thenativeweb/walk-file-tree/issues"
-  },
-  "homepage": "https://github.com/thenativeweb/walk-file-tree#readme",
-  "devDependencies": {
-    "assertthat": "5.2.5",
-    "rimraf": "^3.0.2",
-    "roboter": "11.6.4"
-  },
-  "dependencies": {
-    "@types/node": "14.14.21",
-    "@yeldirium/kaputt": "2.1.0",
-    "@yeldirium/result": "1.2.0"
-  }
+  "keywords": [
+    "file",
+    "directory",
+    "recursive",
+    "walk"
+  ],
+  "license": "MIT"
 }
