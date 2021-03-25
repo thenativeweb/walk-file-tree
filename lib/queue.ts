@@ -1,7 +1,5 @@
-import { kaputt } from '@yeldirium/kaputt';
-import { fail, okay, Result } from '@yeldirium/result';
-
-class QueueIsEmpty extends kaputt('QueueIsEmpty') {}
+import { error, Result, value } from 'defekt';
+import * as errors from './errors';
 
 class Queue<TItem> {
   protected items: TItem[];
@@ -18,10 +16,10 @@ class Queue<TItem> {
     this.items = [ ...items, ...this.items ];
   }
 
-  public pop (): Result<TItem, QueueIsEmpty> {
+  public pop (): Result<TItem, errors.QueueIsEmpty> {
     return this.isEmpty() ?
-      fail(new QueueIsEmpty()) :
-      okay(this.items.pop()!);
+      error(new errors.QueueIsEmpty()) :
+      value(this.items.pop()! as TItem);
   }
 }
 
