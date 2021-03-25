@@ -25,7 +25,7 @@
   "dependencies": {
     "@types/node": "14.14.35",
     "@yeldirium/kaputt": "2.1.0",
-    "@yeldirium/result": "1.2.0"
+    "@yeldirium/result": "1.2.1"
   },
   "devDependencies": {
     "assertthat": "5.2.5",
