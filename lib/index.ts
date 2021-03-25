@@ -1,13 +1,10 @@
 import { EntryType } from './types/EntryType';
 import fs from 'fs';
-import { kaputt } from '@yeldirium/kaputt';
 import nodePath from 'path';
 import { Options } from './types/Options';
 import { Queue } from './queue';
 import { resolveSymlink } from './resolveSymlink';
-import { unpackOrCrash } from '@yeldirium/result';
-
-class RelativePathsAreUnsupported extends kaputt('RelativePathsAreUnsupported') {}
+import * as errors from './errors';
 
 const alwaysTrue = function (): boolean {
   return true;
@@ -26,7 +23,7 @@ const walk = async function * ({
   maximumDepth = Number.POSITIVE_INFINITY
 }: Options): AsyncIterable<string> {
   if (!nodePath.isAbsolute(directory)) {
-    throw new RelativePathsAreUnsupported(undefined, { data: { directory }});
+    throw new errors.RelativePathsAreUnsupported({ data: { directory }});
   }
 
   const paths = new Queue<{ path: string; depth: number }>(
@@ -35,7 +32,7 @@ const walk = async function * ({
   const visisitedPaths = new Set<string>();
 
   while (!paths.isEmpty()) {
-    const { path, depth } = unpackOrCrash(paths.pop());
+    const { path, depth } = paths.pop().unwrapOrThrow();
 
     if (depth > maximumDepth) {
       continue;

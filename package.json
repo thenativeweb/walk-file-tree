@@ -24,8 +24,7 @@
   "types": "build/lib/index.d.ts",
   "dependencies": {
     "@types/node": "14.14.35",
-    "@yeldirium/kaputt": "2.1.0",
-    "@yeldirium/result": "1.2.0"
+    "defekt": "7.0.1"
   },
   "devDependencies": {
     "assertthat": "5.2.5",
