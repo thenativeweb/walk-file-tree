@@ -23,7 +23,7 @@
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
   "dependencies": {
-    "@types/node": "14.14.39",
+    "@types/node": "14.14.41",
     "defekt": "7.1.0"
   },
   "devDependencies": {
