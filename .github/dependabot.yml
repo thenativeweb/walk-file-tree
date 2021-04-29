@@ -1,0 +1,40 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  assignees:
+  - dotKuro
+  - goloroden
+  - strangedev
+  - yeldiRium
+  labels:
+  - Dependencies
+  versioning-strategy: increase
+  allow:
+  - dependency-type: direct
+  ignore:
+  - dependency-name: "@types/node"
+    versions:
+    - 14.14.36
+    - 15.0.1
+  - dependency-name: roboter
+    versions:
+    - 11.6.33
+    - 11.6.36
+    - 11.6.39
+  - dependency-name: semantic-release-configuration
+    versions:
+    - 2.0.0
+  - dependency-name: "@yeldirium/result"
+    versions:
+    - 1.2.1
+  - dependency-name: "@yeldirium/kaputt"
+    versions:
+    - 2.1.1
+  commit-message:
+    prefix: fix
+    prefix-development: chore
