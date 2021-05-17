@@ -1,3 +1,10 @@
+## [1.0.12](https://github.com/thenativeweb/walk-file-tree/compare/1.0.11...1.0.12) (2021-05-17)
+
+
+### Bug Fixes
+
+* bump @types/node from 15.0.2 to 15.3.0 ([#35](https://github.com/thenativeweb/walk-file-tree/issues/35)) ([37530fe](https://github.com/thenativeweb/walk-file-tree/commit/37530fea70fd8ecaa863dcec73c1b1015f98adf6))
+
 ## [1.0.11](https://github.com/thenativeweb/walk-file-tree/compare/1.0.10...1.0.11) (2021-05-17)
 
 
