@@ -1,3 +1,10 @@
+## [1.0.16](https://github.com/thenativeweb/walk-file-tree/compare/1.0.15...1.0.16) (2021-05-31)
+
+
+### Bug Fixes
+
+* bump defekt from 7.1.2 to 7.2.0 ([#43](https://github.com/thenativeweb/walk-file-tree/issues/43)) ([f3e5ce9](https://github.com/thenativeweb/walk-file-tree/commit/f3e5ce972483106fe72749f69e06c87445a5cf1a))
+
 ## [1.0.15](https://github.com/thenativeweb/walk-file-tree/compare/1.0.14...1.0.15) (2021-05-31)
 
 
