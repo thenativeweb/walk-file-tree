@@ -27,9 +27,9 @@
     "defekt": "7.2.0"
   },
   "devDependencies": {
-    "assertthat": "6.3.1",
-    "roboter": "11.7.3",
-    "semantic-release-configuration": "2.0.1"
+    "assertthat": "6.3.3",
+    "roboter": "11.7.6",
+    "semantic-release-configuration": "2.0.4"
   },
   "repository": {
     "type": "git",
