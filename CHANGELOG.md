@@ -1,3 +1,10 @@
+## [1.0.27](https://github.com/thenativeweb/walk-file-tree/compare/1.0.26...1.0.27) (2021-07-26)
+
+
+### Bug Fixes
+
+* bump hosted-git-info from 2.8.8 to 2.8.9 ([#71](https://github.com/thenativeweb/walk-file-tree/issues/71)) ([822b115](https://github.com/thenativeweb/walk-file-tree/commit/822b11547edd9876b0c5c95c03a96167a1be28cd))
+
 ## [1.0.26](https://github.com/thenativeweb/walk-file-tree/compare/1.0.25...1.0.26) (2021-07-26)
 
 
