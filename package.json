@@ -24,7 +24,7 @@
   "types": "build/lib/index.d.ts",
   "dependencies": {
     "@types/node": "16.3.3",
-    "defekt": "7.3.1"
+    "defekt": "7.3.2"
   },
   "devDependencies": {
     "assertthat": "6.3.9",
