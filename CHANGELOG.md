@@ -1,3 +1,10 @@
+## [1.0.30](https://github.com/thenativeweb/walk-file-tree/compare/1.0.29...1.0.30) (2021-08-15)
+
+
+### Bug Fixes
+
+* bump path-parse from 1.0.6 to 1.0.7 ([#76](https://github.com/thenativeweb/walk-file-tree/issues/76)) ([5a5f56d](https://github.com/thenativeweb/walk-file-tree/commit/5a5f56db5eb1623b7badbb43e304210a1cceff33))
+
 ## [1.0.29](https://github.com/thenativeweb/walk-file-tree/compare/1.0.28...1.0.29) (2021-08-09)
 
 
