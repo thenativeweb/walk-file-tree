@@ -12,5 +12,9 @@
   },
   "include": [
     "./**/*.ts"
+  ],
+  "exclude": [
+    "./build",
+    "./test/shared/fixtures"
   ]
 }
