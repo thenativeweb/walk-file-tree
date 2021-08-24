@@ -1,6 +1,6 @@
 {
   "name": "walk-file-tree",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Recursively walk through a file tree.",
   "contributors": [
     {
@@ -24,11 +24,11 @@
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
   "dependencies": {
-    "@types/node": "16.6.1",
-    "defekt": "7.3.2"
+    "@types/node": "16.7.1",
+    "defekt": "7.3.3"
   },
   "devDependencies": {
-    "assertthat": "6.3.12",
+    "assertthat": "6.3.13",
     "roboter": "12.1.2",
     "semantic-release-configuration": "2.0.5"
   },
