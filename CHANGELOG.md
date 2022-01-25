@@ -1,3 +1,10 @@
+## [1.0.34](https://github.com/thenativeweb/walk-file-tree/compare/1.0.33...1.0.34) (2022-01-25)
+
+
+### Bug Fixes
+
+* bump @types/node from 17.0.9 to 17.0.12 ([#116](https://github.com/thenativeweb/walk-file-tree/issues/116)) ([02956be](https://github.com/thenativeweb/walk-file-tree/commit/02956beb819823e82710fd1ef0edac50c0e0024a))
+
 ## [1.0.33](https://github.com/thenativeweb/walk-file-tree/compare/1.0.32...1.0.33) (2022-01-25)
 
 
