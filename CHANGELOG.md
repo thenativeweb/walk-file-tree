@@ -1,3 +1,10 @@
+## [1.0.33](https://github.com/thenativeweb/walk-file-tree/compare/1.0.32...1.0.33) (2022-01-25)
+
+
+### Bug Fixes
+
+* bump defekt from 8.0.0 to 8.1.0 ([#115](https://github.com/thenativeweb/walk-file-tree/issues/115)) ([c8429a2](https://github.com/thenativeweb/walk-file-tree/commit/c8429a206a77a59ac79981d46ab42caa3427dd03))
+
 ## [1.0.32](https://github.com/thenativeweb/walk-file-tree/compare/1.0.31...1.0.32) (2022-01-09)
 
 

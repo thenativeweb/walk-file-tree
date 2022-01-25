@@ -1,6 +1,6 @@
 {
   "name": "walk-file-tree",
-  "version": "1.0.32",
+  "version": "1.0.33",
   "description": "Recursively walk through a file tree.",
   "contributors": [
     {
