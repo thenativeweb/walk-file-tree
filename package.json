@@ -24,7 +24,7 @@
   "main": "build/lib/index.js",
   "types": "build/lib/index.d.ts",
   "dependencies": {
-    "@types/node": "18.11.4",
+    "@types/node": "18.11.8",
     "defekt": "9.3.1"
   },
   "devDependencies": {
